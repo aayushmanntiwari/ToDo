@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Sign In</title>
+    <style>
+      form { margin: 0px 10px; }
+
+      h2 {
+        margin-top: 2px;
+        margin-bottom: 2px;
+      }
+
+      .container { max-width: 360px; }
+
+      .divider {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 5px;
+      }
+
+      .divider hr {
+        margin: 7px 0px;
+        width: 35%;
+      }
+
+      .left { float: left; }
+
+      .right { float: right; }
+
+    </style>
+  </head>
+  <body class="text-center">
+    {% if messages  %}
+      {% for message in messages %}
+            <div class="alert {% if message.tags == 'info' %} alert-info {% endif %} {% if message.tags == 'success' %} alert-success {% endif %}">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              {% if message.tags == 'info' %}
+                <strong>Info!</strong>{{message}}
+              {% endif %}
+              {% if message.tags == 'success' %}
+                <strong>success!</strong>{{message}}
+              {% endif %}
+            </div>
+      {% endfor %}
+    {% endif %}  
+    <div class="container">
+      <div class="row justify-content-center p-3  position-relative">
+        <div class="panel panel-primary">
+          <div class="panel-body border border-dark rounded">
+            <form method="POST" action="#" role="form">
+              {% csrf_token %}
+              <div class="form-group">
+                <h2>Sign in</h2>
+              </div>
+              <div class="form-group">
+                <strong>Email or mobile phone number</strong>
+                <input id="signinEmail" required name="mobileoremail" type="text" class="form-control">
+              </div>
+              <div class="form-group">
+                <strong>Password</strong>
+                <span class="right"><a href="#">Forgot your password?</a></span>
+                <input id="signinPassword" required name="password" type="password"  class="form-control">
+              </div>
+              <div class="form-group" style="padding-top: 12px;">
+                <button id="signinSubmit" type="submit" class="btn btn-success btn-block">Sign in</button>
+              </div>
+              <div class="form-group divider">
+                <hr class="left"><small>New to site?</small><hr class="right">
+              </div>
+              <p class="form-group"><a href="/auth/sign-up/" class="btn btn-info btn-block">Create an account</a></p>
+              <p class="form-group">By signing in you are agreeing to our <a href="#">Terms of Use</a> and our <a href="#">Privacy Policy</a>.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="col-sm-6 p-3">
+    <div class="card">
+      <div class="card-header">
+        Subscription Selected 
+      </div>
+      <div class="card-body overflow-auto">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Plan</td>
+              <td>{% if plan == 'a'%}Annually {% else %} Monthly{% endif %}</td>
+            </tr>
+            <tr>
+
+              <td>Automatic renewal</td>
+              <td>{{automatic}}</td>
+            </tr>
+            <tr>
+              <td>Amount(incl all taxes)</td>
+              <td>{% if amount == 20000 %} 200{% else %}3000{% endif %}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 p-3">
+    <div class="card">
+      <div class="card-header">
+        Payment Gateway
+      </div>
+      <div class="card-body text-center">
+        <form method="post"  id="payment-form">
+          {% csrf_token %}
+          <div class="form-group">
+            <!--<label for="card-number">Card</label>-->
+            <div id="card-number" class="w-100">
+               <!--A STRIP ELEMENT WILL BE INSERTED HERE-->
+            </div>
+            <div class="spinner-border hide-logo mt-1" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+          <div id="card-errors" role="alert"></div>
+          <button type="submit" id="button-submit" class="btn btn-primary">Pay</button>
+        </form>
+      </div>
+    </div>
+    <!-- Display a payment form -->
+  </div>
+</div>

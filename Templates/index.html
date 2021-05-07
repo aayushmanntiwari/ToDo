@@ -1,0 +1,518 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=yes">
+	<meta http-equiv='cache-control' content='no-cache'>
+	<meta http-equiv='expires' content='0'>
+	<meta http-equiv='pragma' content='no-cache'>
+	<title>TO DO</title>
+
+	<!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+
+    <!--Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	  
+	<!-- Propeller CSS -->  
+	<link rel="stylesheet" href="{% static 'css/propeller.min.css' %}">
+	<!--<link rel="stylesheet" href="{% static 'css/payment.css' %}">-->
+	<link rel="stylesheet" href="{% static 'css/card.css' %}">
+
+	<style type="text/css">
+		body{
+		  background:white;
+          height: 100%;
+          width: 100%;
+          padding: 0;
+          margin: 0;
+          overflow-x: hidden;
+		}
+
+
+		h1, h2, h3, h4, h5, p, span, strike{
+		  font-family: 'Montserrat', sans-serif;
+
+		}
+			
+			.modal.left .modal-dialog {
+				width: 320px;
+				max-width: 100%;
+                width: auto !important;
+                display: inline-block;
+				height: 100%;
+				-webkit-transform: translate3d(0%, 0, 0);
+				-ms-transform: translate3d(0%, 0, 0);
+				-o-transform: translate3d(0%, 0, 0);
+				transform: translate3d(0%, 0, 0);
+			}
+
+			.modal.left .modal-content {
+				overflow-y: auto;
+			}
+
+			.modal.left.fade .modal-dialog {
+				left: -320px;
+				-webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+				-moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+				-o-transition: opacity 0.3s linear, left 0.3s ease-out;
+				transition: opacity 0.3s linear, left 0.3s ease-out;
+			}
+
+			.modal.left.fade.show .modal-dialog {
+				left: 0;
+			}
+
+			.modal-content {
+				border-radius: 0;
+				border: none;
+			}
+
+			.modal-header {
+				border-bottom-color: #eeeeee;
+				background-color: #fafafa;
+			}
+
+			.primary-color {
+			 background-color: #007bff !important;
+			}
+
+			.danger-color {
+				background-color: #dc3545 !important;
+			}
+
+			#form-wrapper {
+				position: -webkit-sticky;
+				position: sticky;
+				top: 0rem;
+				border-bottom: 1px solid  #e9e9e9;
+				background-color: #fff;
+				box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+				padding:40px;
+			}
+
+			#submit{
+			background-color: #36d9b6;
+			border-radius: 0;
+			border:0;
+			color: #fff;
+			}
+
+			.flex-wrapper{
+				display: flex;
+			}
+
+			.task-wrapper{
+		  	margin:5px;
+		  	padding: 5px;
+		  	padding:20px;
+		  	cursor: pointer;
+		  	border-bottom: 1px solid  #e9e9e9;
+		  	color: #686868;
+			}
+
+			.error {
+				color: red;
+			}
+			.green {
+				color:seagreen;
+			}
+
+			.hide-logo{
+				display: none;
+			}
+	</style>
+
+</head>
+<body>
+	{% if messages  %}
+      {% for message in messages %}
+            <div class="alert {% if message.tags == 'info' %} alert-info {% endif %} {% if message.tags == 'success' %} alert-success {% endif %}">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              {% if message.tags == 'info'  %}
+                <strong>Info!</strong>{{message}}
+              {% endif %}
+              {% if message.tags == 'success' %}
+                <strong>success!</strong>{{message}}
+              {% endif %}
+            </div>
+      {% endfor %}
+    {% endif %}
+
+	<div class="alert alert-danger invisible alert-dismissible fade show" style="z-index: 1000 !important; position: absolute !important;">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<strong>Danger!</strong> Please sign in first in order to create to do list 
+	</div>
+	
+	
+
+	<nav class="navbar navbar-dark bg-dark">
+		<a class="navbar-brand" href="/">Brand</a>
+		{% if request.user.is_authenticated %}
+			<!-- free trial duration for every user-->
+			{% if  trial_day > 0 and trial_day is not None %}
+				<div class="row ml-auto pr-1">
+					<div class="col">
+						<span class="badge primary-color badge-pill badge-primary" {% if  trial_day <= 7 %} style="border-color: #dc3545;
+						box-shadow: 0px 1px 1px rgb(0 0 0 / 8%) inset, 0px 0px 8px rgb(220 53 69);" {% endif %}>{{trial_day}} days left</span>
+					</div>
+				</div>
+			{% elif has_paid_for_current_month %}
+				<div class="row ml-auto pr-1">
+					<div class="col">
+						<span class="badge primary-color badge-pill badge-primary">Pro Member</span>
+						<span class="badge primary-color badge-pill badge-primary"> {{paid_count_days}} days left</span>
+					</div>
+				</div>
+			{% else %}
+				<div class="row">
+					<div class="col-6  col-lg-5  col-md-5"><span class="badge danger-color badge-pill ">free trial over</span></div>
+					<div class="col-6  col-lg-5 col-md-5"><a href="{% url 'home' %}?upgradetopro=show&request={{upgrade_id}}" class="badge primary-color badge-primary">Become Pro</a></div>
+				</div>
+			{% endif %}
+		{% endif %}
+		<button class="navbar-toggler" type="button" data-toggle="modal" data-target="#sidebarModal">
+			☰
+		</button>
+	</nav>
+	<div class="container-fluid">
+		<div class="modal left fade menu" id="sidebarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog position-fixed m-auto" role="document">
+				<div class="modal-content h-100">
+					<div class="modal-body p-3">
+						{% if request.user.is_authenticated  %}
+							{% if has_paid_for_current_month is not None %}
+								{% if paid_count_days is not None and paid_count_days <= 30 %}
+									<h1>Current Plan: Monthly</h1>
+								{% elif paid_count_days is not None and paid_count_days > 30 %}
+									<h1>Current Plan: 	Annually</h1>
+								{% endif %}
+							{% elif  trial_day > 0 and trial_day is not None %}
+								<h1>Current Plan: Free</h1>
+							{% else %}
+								<h1>Current Plan: No Active Plan</h1>
+							{% endif %}
+						{% endif %}
+						<div class="nav flex-column">
+							{% if request.user.is_authenticated %}
+							<a data-toggle="collapse" href="#collapseExample" class="nav-link btn-user media align-items-center">
+								<img class="mr-3" src="https://pro.propeller.in/assets/images/avatar-icon-40x40.png" width="40" height="40" alt="avatar">
+								<div class="media-body">
+									Welcome {{request.user.first_name}} {{request.user.last_name}} 
+								</div>
+							</a>
+							<a href="#" class="nav-item dropdown-item nav-link">Change password</a>
+							<a href="#" class="nav-item dropdown-item nav-link">Profile update</a>
+							<a class="nav-item nav-link dropdown-item active" href="/auth/logout/">Logout</a>
+							{% else %}
+								<p class = "tpbutton btn-toolbar" style="text-align:center">
+									<a type="submit" class = "btn navbar-btn rounded-pill btn-primary p-3 m-3" href = "/auth/sign-up/" >Sign Up</a>
+									<a class = "btn navbar-btn rounded-pill btn-primary p-3 m-3" href = "/auth/sign-in/" >Sign In</a>
+								</p>
+							{% endif %}
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% if showupgradeplan == 'show' %}
+		<section class="container-fluid">
+				{% include 'upgrade.html' %}
+		</section>
+	{% elif showcard %}
+		<section class="container-fluid" id="paymentgateway">
+			{% include 'card.html' %}
+		</section>
+	{% elif authenticatedSecur == 'show' %}
+		{% include '3dsecure.html' %}
+	{% else %}
+		<section class="container-fluid">
+			<div class="row justify-content-center p-3">
+				<div class="col-xs-12 col-sm-6 col-md-8">
+					<div id="form-wrapper">
+						<form id="form" method="POST">
+							{% csrf_token %}
+							<div class="flex-wrapper">
+								<div style="flex: 6">
+									<input id="title" class="form-control" type="text" name="title" placeholder="Add task">
+								</div>
+								<div style="flex: 1">
+									<input id="submit" class="btn" type="submit" >
+								</div>
+							</div>
+						</form>
+					</div>
+					<div id="list-wrapper">
+					</div>	
+				</div>
+			</div>
+		</section>
+	{% endif %}
+	<script type="text/javascript">
+		/*
+			KEY COMPONENTS:
+			"activeItem" = null until an edit button is clicked. Will contain object of item we are editing
+			"list_snapshot" = Will contain previous state of list. Used for removing extra rows on list update
+			
+			PROCESS:
+			1 - Fetch Data and build rows "buildList()"
+			2 - Create Item on form submit
+			3 - Edit Item click - Prefill form and change submit URL
+			4 - Delete Item - Send item id to delete URL
+			5 - Cross out completed task - Event handle updated item
+			NOTES:
+			-- Add event handlers to "edit", "delete", "title"
+			-- Render with strike through items completed
+			-- Remove extra data on re-render
+			-- CSRF Token
+		*/
+
+		function getCookie(name) {
+		    var cookieValue = null;
+		    if (document.cookie && document.cookie !== '') {
+		        var cookies = document.cookie.split(';');
+		        for (var i = 0; i < cookies.length; i++) {
+		            var cookie = cookies[i].trim();
+		            // Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+		        }
+		    }
+		    return cookieValue;
+		}
+		var csrftoken = getCookie('csrftoken');
+
+		var activeItem = null
+		var list_snapshot = []
+
+		var is_authenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+		if (is_authenticated){
+			buildList()
+		}
+		
+
+		/* this will get all the current user list */
+		function buildList(){
+			var wrapper = document.getElementById('list-wrapper')
+			//wrapper.innerHTML = ''
+			if (wrapper!= null){
+				var url = '/task-list/'
+
+				fetch(url)
+				.then((resp) => resp.json())
+				.then(function(data){
+					console.log('Data:', data)
+
+					var list = data
+					for (var i in list){
+
+
+						try{
+							document.getElementById(`data-row-${i}`).remove()
+						}catch(err){
+
+						}
+				
+
+						/* if the task is not yet completed span tag will be created else stike tag */
+						var title = `<span class="title">${list[i].title}</span>`
+						if (list[i].completed == true){
+							title = `<strike class="title">${list[i].title}</strike>`
+						}
+
+						/* every time we added a new item item div will be created */
+						var item = `
+							<div id="data-row-${i}" class="task-wrapper flex-wrapper">
+								<div style="flex:7">
+									${title}
+								</div>
+								<div style="flex:1">
+									<button class="btn btn-md btn-outline-info edit"><i class="fa fa-edit"></i> </button>
+								</div>
+								<div style="flex:1">
+									<button class="btn btn-md btn-outline-dark delete"><i class="fa fa-trash"></i></button>
+								</div>
+							</div>
+						`
+						if (wrapper!= null){
+							wrapper.innerHTML += item
+						}
+		
+					}
+
+					if (list_snapshot.length > list.length){
+						for (var i = list.length; i < list_snapshot.length; i++){
+							document.getElementById(`data-row-${i}`).remove()
+						}
+					}
+
+					list_snapshot = list
+
+					/* for every item we have edit and delete button which call respective methods */
+					for (var i in list){
+						var editBtn = document.getElementsByClassName('edit')[i]
+						var deleteBtn = document.getElementsByClassName('delete')[i]
+						var title = document.getElementsByClassName('title')[i]
+
+						/* this will call the editItem function which  call the url task-update url */
+						if (editBtn!=null) {
+							editBtn.addEventListener('click', (function(item){
+								return function(){
+									editItem(item)
+								}
+							})(list[i]))
+						}
+
+
+						/* this will call the deleteItem function which  call the url task-delete url */
+						if (deleteBtn!=null) {
+							deleteBtn.addEventListener('click', (function(item){
+								return function(){
+									deleteItem(item)
+								}
+							})(list[i]))
+						}
+
+
+
+						if (title!=null) {
+							title.addEventListener('click', (function(item){
+								return function(){
+									strikeUnstrike(item)
+								}
+							})(list[i]))
+						}
+
+
+					}
+
+
+				})
+			}
+		}
+
+		/* This will add a new task without refreshing the page*/
+		var form = document.getElementById('form-wrapper')
+		if (form!=null) {
+		form.addEventListener('submit', function(e){
+			e.preventDefault()
+			console.log('Form submitted')
+			var is_loggedin = '{{ request.user.is_authenticated }}' == 'True'? true : '';
+			if (is_loggedin == true ) {
+				var url = '/task-create/'
+				if (activeItem != null){
+					var url = `/task-update/${activeItem.id}/`
+					activeItem = null
+				}
+
+
+
+				var title = document.getElementById('title').value
+				fetch(url, {
+					method:'POST',
+					headers:{
+						'Content-type':'application/json',
+						'X-CSRFToken':csrftoken,
+					},
+					body:JSON.stringify({'title':title})
+				}
+				).then(function(response){
+					/* once the new task added this method again create a new list*/
+					buildList()
+					/* this will reset the form*/
+					document.getElementById('form').reset()
+				})
+			}
+			else {
+				$('.alert').removeClass("invisible");
+			}
+		})
+		}
+		/* end */
+
+
+
+
+		function editItem(item){
+			console.log('Item clicked:', item)
+			activeItem = item
+			document.getElementById('title').value = activeItem.title
+		}
+
+
+		function deleteItem(item){
+			console.log('Delete clicked')
+			fetch(`/task-delete/${item.id}/`, {
+				method:'DELETE', 
+				headers:{
+					'Content-type':'application/json',
+					'X-CSRFToken':csrftoken,
+				}
+			}).then((response) => {
+				buildList()
+			})
+		}
+
+		function strikeUnstrike(item){
+			console.log('Strike clicked')
+
+			item.completed = !item.completed
+			fetch(`/task-update/${item.id}/`, {
+				method:'POST', 
+				headers:{
+					'Content-type':'application/json',
+					'X-CSRFToken':csrftoken,
+				},
+				body:JSON.stringify({'title':item.title, 'completed':item.completed})
+			}).then((response) => {
+				buildList()
+			})
+		}
+
+
+	</script>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS, then Propeller js -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://unpkg.com/imask@6.0.5/dist/imask.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="{% static 'js/propeller.min.js' %}"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/parse/3.1.0/parse.min.js"></script>
+	<script type="text/javascript" src="https://js.stripe.com/v3/"></script>
+	{% if showcard %}
+		<script type="text/javascript" src="{% static 'js/card.js' %}"></script>
+		<script>
+			var is_authenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+			if (is_authenticated) {
+				card('{{STRIPE_PUBLISHABLE_KEY}}','{{customer_email}}');
+			}
+		</script>
+	{% endif %}
+	{% if authenticatedSecur == 'show' %}
+		<script type="text/javascript" src="{% static 'js/3dsecure.js' %}"></script>
+		<script>
+			var is_authenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+			if (is_authenticated) {
+				_3dsec('{{ stripe_publishable_key }}', '{{payment_intent_secret}}');
+			}
+		</script>
+	{% endif %}
+	<!-- check for user to stop opening inspect element in browser-->
+	<script>
+		document.addEventListener('contextmenu', function(e) {
+			e.preventDefault();
+		});
+	</script>
+
+</body>
+</html>
